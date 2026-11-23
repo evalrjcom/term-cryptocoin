@@ -8,6 +8,7 @@ usage() {
         '  --interval MINUTES   1, 5, 15, 30, 60, 240, 1440, 10080, 21600 (default 30)' \
         '  --candles COUNT      1–720 (default 48, limited by terminal width)' \
         '  --watch              Refresh every 60 seconds in an interactive terminal' \
+        '  --no-color           Disable red and green candle colors' \
         '  -h, --help           Show this help'
 }
 
@@ -19,6 +20,10 @@ fail() {
 interval=30
 count=48
 watch=0
+color=false
+if [[ -t 1 && ${TERM:-dumb} != dumb && -z ${NO_COLOR:-} ]]; then
+    color=true
+fi
 coins=()
 while (( $# )); do
     case "$1" in
@@ -37,6 +42,7 @@ while (( $# )); do
             count=$2
             shift ;;
         --watch) watch=1 ;;
+        --no-color) color=false ;;
         BTC|ETH|USDT|BNB|USDC|XRP) coins+=("$1") ;;
         *) fail "Unknown argument: $1. See --help." ;;
     esac
@@ -62,9 +68,15 @@ fetch_chart() {
 
     curl -q --fail --silent --show-error --connect-timeout 5 --max-time 15 \
         "https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=${interval}" |
-        jq -er --arg coin "$coin" --argjson limit "$limit" --argjson interval "$interval" '
+        jq -er --arg coin "$coin" --argjson limit "$limit" --argjson interval "$interval" \
+            --argjson color "$color" '
             def row($price; $high; $span):
                 if $span == 0 then 5 else (($high - $price) / $span * 9 | round) end;
+            # Apply direction color to each visible cell so it never spills into the axis.
+            def paint($open; $close):
+                if ($color | not) or . == " " or $open == $close then .
+                elif $close > $open then "\u001b[32m" + . + "\u001b[0m"
+                else "\u001b[31m" + . + "\u001b[0m" end;
             def axis:
                 tostring | ("              " + .)[-([length, 14] | max):];
 
@@ -94,7 +106,7 @@ fetch_chart() {
                   | if $y >= ([$a, $b] | min) and $y <= ([$a, $b] | max) then
                         if $open < $close then "+" elif $open > $close then "-" else "=" end
                     elif $y >= row($top; $high; $span) and $y <= row($bottom; $high; $span) then "|"
-                    else " " end) | join("")))
+                    else " " end | paint($open; $close)) | join("")))
         '
 }
 

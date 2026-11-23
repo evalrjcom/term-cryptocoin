@@ -14,7 +14,7 @@ Run from Bash with `curl` and `jq` on your PATH. On Windows, use Git Bash or WSL
 - Omit symbols to chart all six. The defaults are 30-minute candles and up to 48 candles per chart.
 - Use `--interval` for candle duration in minutes and `--candles` for the maximum number of candles to show. Run `bash term-cryptocoin.sh --help` for all choices. The chart uses `COLUMNS` if set and assumes 80 columns otherwise.
 - Use `--watch` in an interactive terminal to refresh every 60 seconds. Press **q** or **Ctrl+C** to exit. If a refresh fails, the tracker labels and displays the last successful chart for that coin when available.
-- Bodies use `+` for rising, `-` for falling, and `=` for flat. Wicks use `|`. The chart includes Kraken's current, in-progress candle and shows its UTC opening time and OHLC values.
+- Bodies use `+` for rising, `-` for falling, and `=` for flat. Wicks use `|`. On color terminals, rising bodies and wicks are green, falling ones red, and flat ones neutral. Use `--no-color` or set `NO_COLOR=1` for plain text. The chart includes Kraken's current, in-progress candle and shows its UTC opening time and OHLC values.
 
 Data source: [Kraken public OHLC API](https://docs.kraken.com/api-reference/market-data/get-ohlc-data).
 
