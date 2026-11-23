@@ -18,6 +18,10 @@ Run from Bash with `curl` and `jq` on your PATH. On Windows, use Git Bash or WSL
 
 Data source: [Kraken public OHLC API](https://docs.kraken.com/api-reference/market-data/get-ohlc-data).
 
+## Bash scripting lab
+
+[Build the tracker step by step](LAB.md) using an offline fixture, then try the live API.
+
 ## Python tracker
 
 The original CoinGecko tracker is available with `python3 term_cryptocoin.py --help`. It uses Python 3.9+ and accepts an optional CoinGecko Demo API key in `COINGECKO_DEMO_API_KEY`.
